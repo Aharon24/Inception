@@ -1,0 +1,5 @@
+# Secrets
+/secrets/
+
+# Environment variables
+/srcs/.env
