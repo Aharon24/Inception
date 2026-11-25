@@ -1,0 +1,23 @@
+services:
+  mariadb:
+    image: mariadb:inception
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/aharon/data/mariadb
+
+networks:
+  inception:
+    driver: bridge
