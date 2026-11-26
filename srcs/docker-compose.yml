@@ -5,8 +5,38 @@ services:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
     restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
     volumes:
       - mariadb_data:/var/lib/mysql
+    secrets:
+      - db_password
+      - db_root_password
+    networks:
+      - inception
+
+  wordpress:
+    image: wordpress:inception
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    depends_on:
+      - mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_HOST: mariadb
+      WORDPRESS_URL: https://ahapetro.42.fr
+      WORDPRESS_TITLE: Inception
+      WORDPRESS_ADMIN_USER: ahapetro_wpadmin
+      WORDPRESS_ADMIN_EMAIL: petrosyan.aharon27@gmail.com
+    volumes:
+      - wordpress_data:/var/www/html
+    secrets:
+      - db_password
+      - wp_admin_password
     networks:
       - inception
 
@@ -17,6 +47,20 @@ volumes:
       type: none
       o: bind
       device: /home/aharon/data/mariadb
+
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/aharon/data/wordpress
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  wp_admin_password:
+    file: ../secrets/wp_admin_password.txt
 
 networks:
   inception:
